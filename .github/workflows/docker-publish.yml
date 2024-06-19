@@ -29,5 +29,26 @@ jobs:
       - name: Build Eureka Namaing server container
         working-directory: ./naming-server
         run: mvn spring-boot:build-image -DskipTests
+      - name: Build Api-gateway container
+        working-directory: ./api-gateway
+        run: mvn spring-boot:build-image -DskipTests
+      - name: Build aluguel jar
+        working-directory: ./pessoa
+        run: mvn clean package -DskipTests
+      - name: Build aluguel jar
+        working-directory: ./book
+        run: mvn clean package -DskipTests
+      - name: Build aluguel jar
+        working-directory: ./cliente_microservicos
+        run: mvn clean package -DskipTests
+      - name: Build aluguel jar
+        working-directory: ./aluguel
+        run: mvn clean package -DskipTests
+      - name: Build aluguel jar
+        working-directory: ./multa
+        run: mvn clean package -DskipTests
+      - name: docker compose build 
+        working-directory: .
+        run: docker compose build
 
         
