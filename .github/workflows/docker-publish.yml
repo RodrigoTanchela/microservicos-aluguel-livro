@@ -21,5 +21,13 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERMANE }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Setup Java JDK
+        uses: actions/setup-java@v4.2.1
+        with:
+          java-version: '17'
+          distribution: 'adopt'
+      - name: Build Eureka Namaing server container
+        working-directory: ./naming-server
+        run: mvn spring-boot:build-image -DskipTests
 
         
