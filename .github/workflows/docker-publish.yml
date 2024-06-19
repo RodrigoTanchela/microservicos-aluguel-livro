@@ -52,19 +52,19 @@ jobs:
         run: docker compose build
       - name: Push to Docker Hub Container Registry
         run: |
-          docker tag ${{ secrets.DOCKER_USERNAME }}/naming-server:0.0.1-SNAPSHOT ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
-          docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway:0.0.1-SNAPSHOT ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
-          docker tag ${{ secrets.DOCKER_USERNAME }}/pessoa:latest ${{ secrets.DOCKER_USERNAME }}/cambio-service:${{github.run_id}}
-          docker tag ${{ secrets.DOCKER_USERNAME }}/book:latest ${{ secrets.DOCKER_USERNAME }}/book-service:${{github.run_id}}
-          docker tag ${{ secrets.DOCKER_USERNAME }}/multa:latest ${{ secrets.DOCKER_USERNAME }}/cambio-service:${{github.run_id}}
-          docker tag ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:latest ${{ secrets.DOCKER_USERNAME }}/book-service:${{github.run_id}}
-          docker tag ${{ secrets.DOCKER_USERNAME }}/aluguel:latest ${{ secrets.DOCKER_USERNAME }}/cambio-service:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/pessoa:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/book:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/multa:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERMANE }}/naming-server:0.0.1-SNAPSHOT ${{ secrets.DOCKER_USERMANE }}/naming-server:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERMANE }}/api-gateway:0.0.1-SNAPSHOT ${{ secrets.DOCKER_USERMANE }}/api-gateway:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERMANE }}/pessoa:latest ${{ secrets.DOCKER_USERMANE }}/cambio-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERMANE }}/book:latest ${{ secrets.DOCKER_USERMANE }}/book-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERMANE }}/multa:latest ${{ secrets.DOCKER_USERMANE }}/cambio-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERMANE }}/clientes.springboot:latest ${{ secrets.DOCKER_USERMANE }}/book-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERMANE }}/aluguel:latest ${{ secrets.DOCKER_USERMANE }}/cambio-service:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERMANE }}/naming-server:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERMANE }}/api-gateway:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERMANE }}/pessoa:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERMANE }}/book:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERMANE }}/multa:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERMANE }}/clientes.springboot:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERMANE }}/aluguel:${{github.run_id}}
 
         
