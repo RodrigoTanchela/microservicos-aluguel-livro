@@ -72,7 +72,7 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/multa:${{github.run_id}}
           docker push ${{ secrets.DOCKER_USERNAME }}/multa:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:${{github.run_id}}
-          docker push ${{ secrets.DOCKER_USERNAME }}/latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
           docker push ${{ secrets.DOCKER_USERNAME }}/aluguel:latest
 
