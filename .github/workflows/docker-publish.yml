@@ -50,5 +50,21 @@ jobs:
       - name: docker compose build 
         working-directory: .
         run: docker compose build
+      - name: Push to Docker Hub Container Registry
+        run: |
+          docker tag ${{ secrets.DOCKER_USERNAME }}/naming-server:0.0.1-SNAPSHOT ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/api-gateway:0.0.1-SNAPSHOT ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/pessoa:latest ${{ secrets.DOCKER_USERNAME }}/cambio-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/book:latest ${{ secrets.DOCKER_USERNAME }}/book-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/multa:latest ${{ secrets.DOCKER_USERNAME }}/cambio-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:latest ${{ secrets.DOCKER_USERNAME }}/book-service:${{github.run_id}}
+          docker tag ${{ secrets.DOCKER_USERNAME }}/aluguel:latest ${{ secrets.DOCKER_USERNAME }}/cambio-service:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERNAME }}/pessoa:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERNAME }}/book:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERNAME }}/multa:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:${{github.run_id}}
+          docker push ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
 
         
