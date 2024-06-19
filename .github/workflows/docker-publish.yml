@@ -32,19 +32,19 @@ jobs:
       - name: Build Api-gateway container
         working-directory: ./api-gateway
         run: mvn spring-boot:build-image -DskipTests
-      - name: Build aluguel jar
+      - name: Build pessoa jar
         working-directory: ./pessoa
         run: mvn clean package -DskipTests
-      - name: Build aluguel jar
+      - name: Build book jar
         working-directory: ./book
         run: mvn clean package -DskipTests
-      - name: Build aluguel jar
+      - name: Build cliente jar
         working-directory: ./cliente_microservicos
         run: mvn clean package -DskipTests
       - name: Build aluguel jar
         working-directory: ./aluguel
         run: mvn clean package -DskipTests
-      - name: Build aluguel jar
+      - name: Build multa jar
         working-directory: ./multa
         run: mvn clean package -DskipTests
       - name: docker compose build 
