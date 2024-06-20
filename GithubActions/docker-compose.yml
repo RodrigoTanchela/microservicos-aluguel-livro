@@ -1,0 +1,177 @@
+
+services:
+  naming-server:
+    image: rodrigodocker158/naming-server:latest
+    ports:
+      - 8761:8761
+    networks:
+      - rodrigo-network
+
+  api-gateway:
+    image: rodrigodocker158/api-gateway:latest
+    ports:
+      - 8765:8765
+    depends_on:
+      - naming-server
+    environment:
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+      JWT_SECRET: oxktUVeFYg2KMcOpCmH+xqgPkbcQYBlaGGOI75hZrss
+    networks:
+      - rodrigo-network
+
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - rodrigo-network
+
+  pessoa-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pessoa
+    volumes:
+      - pessoa-db-data:/var/lib/postgresql/data
+    networks:
+      - rodrigo-network
+
+  multa-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: multa
+    volumes:
+      - multa-db-data:/var/lib/postgresql/data
+    networks:
+      - rodrigo-network
+
+  cliente-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: usuarios_microservicos
+    volumes:
+      - cliente-db-data:/var/lib/postgresql/data
+    networks:
+      - rodrigo-network
+
+  livro-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: livro
+    volumes:
+      - livro-db-data:/var/lib/postgresql/data
+    networks:
+      - rodrigo-network
+
+  aluguel-db:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: aluguel
+    volumes:
+      - aluguel-db-data:/var/lib/postgresql/data
+    networks:
+      - rodrigo-network
+  
+  pessoa:
+    image: rodrigodocker158/pessoa:latest
+    ports:
+      - 8700:8700
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://pessoa-db:5432/pessoa
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+    depends_on:
+      - pessoa-db
+      - naming-server
+    networks:
+      - rodrigo-network
+
+  multa:
+    image: rodrigodocker158/multa:latest
+    ports:
+      - 9000:9000
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://multa-db:5432/multa
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+    depends_on:
+      - multa-db
+      - naming-server
+      - aluguel
+    networks:
+      - rodrigo-network
+
+  cliente:
+    image: rodrigodocker158/clientes.springboot:latest
+    ports:
+      - 8200:8200
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://cliente-db:5432/usuarios_microservicos
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+      SECURITY_JWT_TOKEN_SECRET_KEY: oxktUVeFYg2KMcOpCmH+xqgPkbcQYBlaGGOI75hZrss
+    depends_on:
+      - cliente-db
+      - naming-server
+      - pessoa
+    networks:
+      - rodrigo-network
+
+  book:
+    image: rodrigodocker158/book:latest
+    ports:
+      - 8000:8000
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://livro-db:5432/livro
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+    depends_on:
+      - livro-db
+      - naming-server
+    networks:
+      - rodrigo-network
+      
+  aluguel:
+    image: rodrigodocker158/aluguel:latest
+    ports:
+      - 8100:8100
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://aluguel-db:5432/aluguel
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: postgres
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+    depends_on:
+      - aluguel-db
+      - naming-server
+      - pessoa
+      - book
+    networks:
+      - rodrigo-network
+
+networks:
+  rodrigo-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+  pessoa-db-data:
+  multa-db-data:
+  cliente-db-data:
+  livro-db-data:
+  aluguel-db-data:
