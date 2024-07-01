@@ -3,13 +3,14 @@ services:
   naming-server:
     image: rodrigodocker158/naming-server:0.0.1-SNAPSHOT
     ports:
-      - 8761:8761
+      - 8766:8761
     networks:
       - rodrigo-network
+
   api-gateway:
     image: rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
     ports:
-      - 8765:8765
+      - 8770:8765
     depends_on:
       - naming-server
     environment:
@@ -17,27 +18,55 @@ services:
       JWT_SECRET: oxktUVeFYg2KMcOpCmH+xqgPkbcQYBlaGGOI75hZrss
     networks:
       - rodrigo-network
+
   postgres:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
+  
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+       - rodrigo-network
+    ports:
+      - 9095:9090
+  
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3005:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - rodrigo-network
+          
   pessoa-db:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: pessoa
+    volumes:
+      - pessoa-db-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
+
   multa-db:
     image: postgres:13
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: multa
+    volumes:
+      - multa-db-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
 
@@ -47,6 +76,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: usuarios_microservicos
+    volumes:
+      - cliente-db-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
 
@@ -56,6 +87,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: livro
+    volumes:
+      - livro-db-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
 
@@ -65,13 +98,15 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: aluguel
+    volumes:
+      - aluguel-db-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
   
   pessoa:
     image: rodrigodocker158/pessoa
     ports:
-      - 8700:8700
+      - 8705:8700
     build:
       context: .
       dockerfile: pessoa/Dockerfile
@@ -80,6 +115,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,prometheus
     depends_on:
       - pessoa-db
       - naming-server
@@ -89,7 +125,7 @@ services:
   multa:
     image: rodrigodocker158/multa
     ports:
-      - 9000:9000
+      - 9005:9000
     build:
       context: .
       dockerfile: multa/Dockerfile
@@ -98,6 +134,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,prometheus
     depends_on:
       - multa-db
       - naming-server
@@ -108,7 +145,7 @@ services:
   cliente:
     image: rodrigodocker158/clientes.springboot
     ports:
-      - 8200:8200
+      - 8205:8200
     build:
       context: .
       dockerfile: cliente_microservicos/Dockerfile
@@ -118,6 +155,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: postgres
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
       SECURITY_JWT_TOKEN_SECRET_KEY: oxktUVeFYg2KMcOpCmH+xqgPkbcQYBlaGGOI75hZrss
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,prometheus
     depends_on:
       - cliente-db
       - naming-server
@@ -128,7 +166,7 @@ services:
   book:
     image: rodrigodocker158/book
     ports:
-      - 8000:8000
+      - 8005:8000
     build:
       context: .
       dockerfile: book/Dockerfile
@@ -137,6 +175,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: "health,prometheus"
     depends_on:
       - livro-db
       - naming-server
@@ -146,7 +185,7 @@ services:
   aluguel:
     image: rodrigodocker158/aluguel
     ports:
-      - 8100:8100
+      - 8105:8100
     build:
       context: .
       dockerfile: aluguel/Dockerfile
@@ -155,6 +194,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
       EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://naming-server:8761/eureka
+      MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE: health,prometheus
     depends_on:
       - aluguel-db
       - naming-server
@@ -162,7 +202,17 @@ services:
       - book
     networks:
       - rodrigo-network
+
 networks:
   rodrigo-network:
     driver: bridge
 
+volumes:
+  postgres-data:
+  pessoa-db-data:
+  multa-db-data:
+  cliente-db-data:
+  livro-db-data:
+  aluguel-db-data:
+  prometheus_data:
+  grafana_data:
