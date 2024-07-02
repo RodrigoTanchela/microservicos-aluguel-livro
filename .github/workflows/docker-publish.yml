@@ -75,56 +75,135 @@ jobs:
           docker push ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:latest
           docker push ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
           docker push ${{ secrets.DOCKER_USERNAME }}/aluguel:latest
-          
   deploy:
-    runs-on: ubuntu-latest
     needs: build
-
+    runs-on: self-hosted
     steps:
-    - name: Checkout do código
-      uses: actions/checkout@v2
+        - name: Log in to Docker Hub
+          run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-    - name: Deploy via SSH para localhost
-      uses: appleboy/ssh-action@v0.1.2
-      with:
-        host: ${{ secrets.REMOTE_HOST }}
-        username: ${{ secrets.REMOTE_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: |
-          # Pull das imagens Docker
-          docker pull ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
-          docker pull ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
-          docker pull ${{ secrets.DOCKER_USERNAME }}/pessoa:${{github.run_id}}
-          docker pull ${{ secrets.DOCKER_USERNAME }}/book:${{github.run_id}}
-          docker pull ${{ secrets.DOCKER_USERNAME }}/multa:${{github.run_id}}
-          docker pull ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:${{github.run_id}}
-          docker pull ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
-
-          # Parar e remover contêineres existentes
-          docker stop naming-server-container || true
-          docker rm naming-server-container || true
-          docker stop api-gateway-container || true
-          docker rm api-gateway-container || true
-          docker stop pessoa-container || true
-          docker rm pessoa-container || true
-          docker stop book-container || true
-          docker rm book-container || true
-          docker stop multa-container || true
-          docker rm multa-container || true
-          docker stop clientes.springboot-container || true
-          docker rm clientes.springboot-container || true
-          docker stop aluguel-container || true
-          docker rm aluguel-container || true
-
-          # Iniciar contêineres Docker
-          docker run -d --name naming-server-container -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
-          docker run -d --name api-gateway-container -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
-          docker run -d --name pessoa-container -p 8082:8082 ${{ secrets.DOCKER_USERNAME }}/pessoa:${{github.run_id}}
-          docker run -d --name book-container -p 8083:8083 ${{ secrets.DOCKER_USERNAME }}/book:${{github.run_id}}
-          docker run -d --name multa-container -p 8084:8084 ${{ secrets.DOCKER_USERNAME }}/multa:${{github.run_id}}
-          docker run -d --name clientes.springboot-container -p 8085:8085 ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:${{github.run_id}}
-          docker run -d --name aluguel-container -p 8086:8086 ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
-
-
-
-        
+        - name: Deploy naming-server
+          run: |
+            docker pull rodrigodocker158/naming-server:0.0.1-SNAPSHOT
+            docker rm -f naming-server || true
+            docker run -d -p 8761:8761 --name naming-server rodrigodocker158/naming-server:0.0.1-SNAPSHOT
+        - name: Deploy api-gateway
+          run: |
+            docker pull rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
+            docker rm -f api-gateway || true
+            docker run -d -p 8765:8765 \
+              -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
+              -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
+              --name api-gateway \
+              rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
+        - name: Deploy pessoa-db
+          run: |
+            docker pull postgres:13
+            docker rm -f pessoa-db || true
+            docker run -d \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e POSTGRES_DB=pessoa \
+              --name pessoa-db \
+              -v pessoa-db-data:/var/lib/postgresql/data \
+              postgres:13
+        - name: Deploy multa-db
+          run: |
+            docker pull postgres:13
+            docker rm -f multa-db || true
+            docker run -d \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e POSTGRES_DB=multa \
+              --name multa-db \
+              -v multa-db-data:/var/lib/postgresql/data \
+              postgres:13
+        - name: Deploy cliente-db
+          run: |
+            docker pull postgres:13
+            docker rm -f cliente-db || true
+            docker run -d \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e POSTGRES_DB=usuarios_microservicos \
+              --name cliente-db \
+              -v cliente-db-data:/var/lib/postgresql/data \
+              postgres:13
+        - name: Deploy livro-db
+          run: |
+            docker pull postgres:13
+            docker rm -f livro-db || true
+            docker run -d \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e POSTGRES_DB=livro \
+              --name livro-db \
+              -v livro-db-data:/var/lib/postgresql/data \
+              postgres:13
+        - name: Deploy aluguel-db
+          run: |
+            docker pull postgres:13
+            docker rm -f aluguel-db || true
+            docker run -d \
+              -e POSTGRES_USER=postgres \
+              -e POSTGRES_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e POSTGRES_DB=aluguel \
+              --name aluguel-db \
+              -v aluguel-db-data:/var/lib/postgresql/data \
+              postgres:13
+        - name: Deploy pessoa
+          run: |
+            docker pull rodrigodocker158/pessoa:latest
+            docker rm -f pessoa || true
+            docker run -d -p 8700:8700 \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://pessoa-db:5432/pessoa \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
+              --name pessoa \
+              rodrigodocker158/pessoa:latest
+        - name: Deploy multa
+          run: |
+            docker pull rodrigodocker158/multa:latest
+            docker rm -f multa || true
+            docker run -d -p 9000:9000 \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://multa-db:5432/multa \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
+              --name multa \
+              rodrigodocker158/multa:latest
+        - name: Deploy cliente
+          run: |
+            docker pull rodrigodocker158/clientes.springboot:latest
+            docker rm -f cliente || true
+            docker run -d -p 8200:8200 \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://cliente-db:5432/usuarios_microservicos \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
+              -e SECURITY_JWT_TOKEN_SECRET_KEY=${{ secrets.JWT_SECRET }} \
+              --name cliente \
+              rodrigodocker158/clientes.springboot:latest
+        - name: Deploy book
+          run: |
+            docker pull rodrigodocker158/book:latest
+            docker rm -f book || true
+            docker run -d -p 8000:8000 \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://livro-db:5432/livro \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
+              --name book \
+              rodrigodocker158/book:latest
+        - name: Deploy aluguel
+          run: |
+            docker pull rodrigodocker158/aluguel:latest
+            docker rm -f aluguel || true
+            docker run -d -p 8100:8100 \
+              -e SPRING_DATASOURCE_URL=jdbc:postgresql://aluguel-db:5432/aluguel \
+              -e SPRING_DATASOURCE_USERNAME=postgres \
+              -e SPRING_DATASOURCE_PASSWORD=${{ secrets.DATABASE_PASSWORD }} \
+              -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
+              --name aluguel \
+              rodrigodocker158/aluguel:latest
