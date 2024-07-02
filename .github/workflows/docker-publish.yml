@@ -81,14 +81,50 @@ jobs:
     needs: build
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout do código
+      uses: actions/checkout@v2
 
-      - name: Trigger Render deploy
-        uses: render-examples/deploy-action@v1
-        with:
-          service-id: ${{ secrets.RENDER_SERVICE_ID }}
-          api-key: ${{ secrets.RENDER_API_KEY }}
+    - name: Deploy via SSH para localhost
+      uses: appleboy/ssh-action@v0.1.2
+      with:
+        host: REMOTE_HOST
+        username: ${{ secrets.REMOTE_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          # Pull das imagens Docker
+          docker pull ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/pessoa:${{github.run_id}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/book:${{github.run_id}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/multa:${{github.run_id}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:${{github.run_id}}
+          docker pull ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
+
+          # Parar e remover contêineres existentes
+          docker stop naming-server-container || true
+          docker rm naming-server-container || true
+          docker stop api-gateway-container || true
+          docker rm api-gateway-container || true
+          docker stop pessoa-container || true
+          docker rm pessoa-container || true
+          docker stop book-container || true
+          docker rm book-container || true
+          docker stop multa-container || true
+          docker rm multa-container || true
+          docker stop clientes.springboot-container || true
+          docker rm clientes.springboot-container || true
+          docker stop aluguel-container || true
+          docker rm aluguel-container || true
+
+          # Iniciar contêineres Docker
+          docker run -d --name naming-server-container -p 8080:8080 ${{ secrets.DOCKER_USERNAME }}/naming-server:${{github.run_id}}
+          docker run -d --name api-gateway-container -p 8081:8081 ${{ secrets.DOCKER_USERNAME }}/api-gateway:${{github.run_id}}
+          docker run -d --name pessoa-container -p 8082:8082 ${{ secrets.DOCKER_USERNAME }}/pessoa:${{github.run_id}}
+          docker run -d --name book-container -p 8083:8083 ${{ secrets.DOCKER_USERNAME }}/book:${{github.run_id}}
+          docker run -d --name multa-container -p 8084:8084 ${{ secrets.DOCKER_USERNAME }}/multa:${{github.run_id}}
+          docker run -d --name clientes.springboot-container -p 8085:8085 ${{ secrets.DOCKER_USERNAME }}/clientes.springboot:${{github.run_id}}
+          docker run -d --name aluguel-container -p 8086:8086 ${{ secrets.DOCKER_USERNAME }}/aluguel:${{github.run_id}}
+
 
 
         
