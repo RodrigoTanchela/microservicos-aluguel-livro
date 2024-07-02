@@ -84,12 +84,12 @@ jobs:
 
         - name: Deploy naming-server
           run: |
-            docker pull rodrigodocker158/naming-server:0.0.1-SNAPSHOT
+            docker pull rodrigodocker158/naming-server:latest
             docker rm -f naming-server || true
             docker run -d -p 8761:8761 --name naming-server rodrigodocker158/naming-server:latest
         - name: Deploy api-gateway
           run: |
-            docker pull rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
+            docker pull rodrigodocker158/api-gateway:latest
             docker rm -f api-gateway || true
             docker run -d -p 8765:8765 \
               -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
