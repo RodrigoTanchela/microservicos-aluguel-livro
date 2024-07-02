@@ -86,7 +86,7 @@ jobs:
           run: |
             docker pull rodrigodocker158/naming-server:0.0.1-SNAPSHOT
             docker rm -f naming-server || true
-            docker run -d -p 8761:8761 --name naming-server rodrigodocker158/naming-server:0.0.1-SNAPSHOT
+            docker run -d -p 8761:8761 --name naming-server rodrigodocker158/naming-server:latest
         - name: Deploy api-gateway
           run: |
             docker pull rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
@@ -95,7 +95,7 @@ jobs:
               -e EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://naming-server:8761/eureka \
               -e JWT_SECRET=${{ secrets.JWT_SECRET }} \
               --name api-gateway \
-              rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
+              rodrigodocker158/api-gateway:latest
         - name: Deploy pessoa-db
           run: |
             docker pull postgres:13
