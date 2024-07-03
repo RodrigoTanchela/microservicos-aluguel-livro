@@ -4,14 +4,14 @@ services:
   naming-server:
     image: rodrigodocker158/naming-server:0.0.1-SNAPSHOT
     ports:
-      - 8800:8761
+      - 8790:8761
     networks:
       - rodrigo-network
 
   api-gateway:
     image: rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
     ports:
-      - 8140:8765
+      - 8095:8765
     depends_on:
       - naming-server
     environment:
@@ -38,12 +38,12 @@ services:
     networks:
        - rodrigo-network
     ports:
-      - 9050:9090
+      - 9099:9090
 
   grafana:
     image: grafana/grafana
     ports:
-      - 3070:3000
+      - 3050:3000
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
@@ -107,7 +107,7 @@ services:
   pessoa:
     image: rodrigodocker158/pessoa
     ports:
-      - 8790:8700
+      - 8750:8700
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://pessoa-db:5432/pessoa
       SPRING_DATASOURCE_USERNAME: postgres
@@ -123,7 +123,7 @@ services:
   multa:
     image: rodrigodocker158/multa
     ports:
-      - 9080:9000
+      - 9050:9000
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://multa-db:5432/multa
       SPRING_DATASOURCE_USERNAME: postgres
@@ -140,7 +140,7 @@ services:
   cliente:
     image: rodrigodocker158/clientes.springboot
     ports:
-      - 8300:8200
+      - 8250:8200
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://cliente-db:5432/usuarios_microservicos
       SPRING_DATASOURCE_USERNAME: postgres
@@ -158,7 +158,7 @@ services:
   book:
     image: rodrigodocker158/book
     ports:
-      - 8070:8000
+      - 8050:8000
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://livro-db:5432/livro
       SPRING_DATASOURCE_USERNAME: postgres
@@ -174,7 +174,7 @@ services:
   aluguel:
     image: rodrigodocker158/aluguel
     ports:
-      - 8170:8100
+      - 8150:8100
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://aluguel-db:5432/aluguel
       SPRING_DATASOURCE_USERNAME: postgres
