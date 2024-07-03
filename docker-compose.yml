@@ -4,14 +4,14 @@ services:
   naming-server:
     image: rodrigodocker158/naming-server:0.0.1-SNAPSHOT
     ports:
-      - 8761:8761
+      - 8800:8761
     networks:
       - rodrigo-network
 
   api-gateway:
     image: rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
     ports:
-      - 8080:8765
+      - 8140:8765
     depends_on:
       - naming-server
     environment:
@@ -38,12 +38,12 @@ services:
     networks:
        - rodrigo-network
     ports:
-      - 9090:9090
+      - 9050:9090
 
   grafana:
     image: grafana/grafana
     ports:
-      - 3001:3000
+      - 3070:3000
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
@@ -107,7 +107,7 @@ services:
   pessoa:
     image: rodrigodocker158/pessoa
     ports:
-      - 8701:8700
+      - 8790:8700
     build:
       context: .
       dockerfile: pessoa/Dockerfile
@@ -126,7 +126,7 @@ services:
   multa:
     image: rodrigodocker158/multa
     ports:
-      - 9001:9000
+      - 9080:9000
     build:
       context: .
       dockerfile: multa/Dockerfile
@@ -146,7 +146,7 @@ services:
   cliente:
     image: rodrigodocker158/clientes.springboot
     ports:
-      - 8201:8200
+      - 8300:8200
     build:
       context: .
       dockerfile: cliente_microservicos/Dockerfile
@@ -167,7 +167,7 @@ services:
   book:
     image: rodrigodocker158/book
     ports:
-      - 8001:8000
+      - 8070:8000
     build:
       context: .
       dockerfile: book/Dockerfile
@@ -186,7 +186,7 @@ services:
   aluguel:
     image: rodrigodocker158/aluguel
     ports:
-      - 8101:8100
+      - 8170:8100
     build:
       context: .
       dockerfile: aluguel/Dockerfile
