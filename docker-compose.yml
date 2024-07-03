@@ -1,16 +1,17 @@
+version: '3.8'
 
 services:
   naming-server:
     image: rodrigodocker158/naming-server:0.0.1-SNAPSHOT
     ports:
-      - 8766:8761
+      - 8800:8761
     networks:
       - rodrigo-network
 
   api-gateway:
     image: rodrigodocker158/api-gateway:0.0.1-SNAPSHOT
     ports:
-      - 8770:8765
+      - 8140:8765
     depends_on:
       - naming-server
     environment:
@@ -28,7 +29,7 @@ services:
       - postgres-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
-  
+
   prometheus:
     image: prom/prometheus:latest
     volumes:
@@ -37,17 +38,17 @@ services:
     networks:
        - rodrigo-network
     ports:
-      - 9095:9090
-  
+      - 9050:9090
+
   grafana:
     image: grafana/grafana
     ports:
-      - "3005:3000"
+      - 3070:3000
     volumes:
       - grafana_data:/var/lib/grafana
     networks:
       - rodrigo-network
-          
+
   pessoa-db:
     image: postgres:13
     environment:
@@ -102,11 +103,11 @@ services:
       - aluguel-db-data:/var/lib/postgresql/data
     networks:
       - rodrigo-network
-  
+
   pessoa:
     image: rodrigodocker158/pessoa
     ports:
-      - 8705:8700
+      - 8790:8700
     build:
       context: .
       dockerfile: pessoa/Dockerfile
@@ -125,7 +126,7 @@ services:
   multa:
     image: rodrigodocker158/multa
     ports:
-      - 9005:9000
+      - 9080:9000
     build:
       context: .
       dockerfile: multa/Dockerfile
@@ -145,7 +146,7 @@ services:
   cliente:
     image: rodrigodocker158/clientes.springboot
     ports:
-      - 8205:8200
+      - 8300:8200
     build:
       context: .
       dockerfile: cliente_microservicos/Dockerfile
@@ -166,7 +167,7 @@ services:
   book:
     image: rodrigodocker158/book
     ports:
-      - 8005:8000
+      - 8070:8000
     build:
       context: .
       dockerfile: book/Dockerfile
@@ -181,11 +182,11 @@ services:
       - naming-server
     networks:
       - rodrigo-network
-      
+
   aluguel:
     image: rodrigodocker158/aluguel
     ports:
-      - 8105:8100
+      - 8170:8100
     build:
       context: .
       dockerfile: aluguel/Dockerfile
